@@ -20,6 +20,7 @@ from tqdm import tqdm
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import ast
+import socket
 
 config = json.load(open(sys.argv[1], 'r'))
 
@@ -387,6 +388,9 @@ class FlowerClient(fl.client.NumPyClient):
         loss, target_metric = test(net, testloader)
         return loss, len(testloader.dataset), {"target_metric": target_metric}
 
-
+while True:
+    if socket.socket().connect_ex((f"{sys.argv[3]}", 8080)) == 0:
+        break
+    time.sleep(1)
 # Start Flower client
 fl.client.start_numpy_client(server_address=f"{sys.argv[3]}:8080", client=FlowerClient(), client_index=int(sys.argv[2]))
